@@ -1,11 +1,11 @@
 {
-  "name": "chatapp",
+  "name": "MegaTalk",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "server": "nodemon backend/server.js",
+    "start": "node server/server.js",
+    "server": "nodemon server/server.js",
     "build": "npm install --prefix && npm install --prefix frontEnd && npm run build --prefix frontEnd"
   },
   "author": "",
