@@ -20,6 +20,7 @@
     "axios": "^1.6.2",
     "emoji-mart": "^5.5.2",
     "emoji-picker-react": "^4.5.16",
+    "MegaTalk": "file:..",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-loader-spinner": "^5.4.5",
