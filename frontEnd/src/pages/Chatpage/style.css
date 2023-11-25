@@ -1,0 +1,21 @@
+#chatPage {
+    height: 100vh;
+    /* overflow: hidden; */
+}
+
+.chatBox{
+    /* background-image: url("../../assets/hd.jpg"); */
+    /* background-color: rgb(213, 225, 243); */
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+
+.chatTextBox{
+    background-image: url("../../assets/defaultChatBg.png");
+    /* background-image: url("../../assets/hd.jpg"); */
+    background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+}

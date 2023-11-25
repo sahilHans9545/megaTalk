@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+*{
+    @apply transition-colors duration-100 ;
+}
+
+
+@layer base{
+    :root{
+        --color1:  #dbeafe;
+        --color2: #bfdbfe;
+        --color3:#93c5fd ;
+        --color4:#60a5fa ;
+        --color5: #3b82f6;
+        --color6:#2563eb ;
+        --color7: #1d4ed8;
+        --color8: #1e40af;
+        --color9:#1e3a8a ;
+        /* 50 #eff6ff 100  200  300  400  500  600  700  800  900  950 #172554 */
+    }
+
+    .theme-green{
+        --color1:#dcfce7;
+        --color2:#bbf7d0;
+        --color3:#86efac ;
+        --color4:#4ade80;
+        --color5:#22c55e;
+        --color6:#16a34a;
+        --color7:#15803d;
+        --color8:#166534;
+        --color9:#14532d;
+    }
+    .theme-red{
+        --color1:#fee2e2 ;
+        --color2:#fecaca; 
+        --color3:#fca5a5 ; 
+        --color4:#f87171 ; 
+        --color5:#ef4444 ;
+        --color6:#dc2626 ;
+        --color7:#b91c1c ; 
+        --color8:#991b1b ; 
+        --color9:#7f1d1d ; 
+    }
+    .theme-pink{
+        --color1: #fce7f3;
+        --color2: #fbcfe8;
+        --color3: #f9a8d4; 
+        --color4: #f472b6 ; 
+        --color5: #ec4899; 
+        --color6: #db2777; 
+        --color7: #be185d; 
+        --color8: #9d174d; 
+        --color9: #831843;
+    }
+    .theme-yellow{
+        --color1: #fef9c3;
+        --color2: #fef08a;
+        --color3: #fde047;
+        --color4: #facc15;
+        --color5: #eab308;
+        --color6: #ca8a04;
+        --color7: #a16207;
+        --color8: #a16207;
+        --color9: #a16207;
+
+         /* 200  300  400  500  600  700  800 #854d0e 900 #713f12 */
+    }
+}
+
+/* Firefox */
+* {
+    scrollbar-width: auto;
+    scrollbar-color: #050505 #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 3px;
+}
+
+*::-webkit-scrollbar-track {
+    /* background: #ffffff; */
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #dddddd;
+    border-radius: 10px;
+    /* border: 3px solid #ffffff; */
+}
+
+
+em-emoji-picker{
+    max-width: 100%;
+}
+
+@media screen and (max-width:576px) {
+    em-emoji-picker {
+        height: 280px;
+    }
+}
+ #preview{
+    display: none !important;
+}
+
