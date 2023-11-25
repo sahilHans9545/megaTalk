@@ -58,7 +58,9 @@ if (process.env.NODE_ENV === "production") {
 // console.log(process.env.SMTP_EMAIL);
 const server = app.listen(5000, () => {
   mongoose
-    .connect(process.env.MONGO_URL)
+    .connect(
+      "mongodb+srv://hanss9545:yHzKqKRSeBnIsR3b@cluster0.4gqosjj.mongodb.net/MegaTalk"
+    )
     .then(() => {
       console.log(`Example app listening on port 5000`);
     })
