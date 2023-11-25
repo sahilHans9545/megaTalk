@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+
+dotenv.config();
 const cors = require("cors");
 const router = require("./routes/router");
 const path = require("path");
@@ -10,7 +12,6 @@ const app = express();
 app.use(cors());
 app.disable("x-powered-by");
 
-// dotenv.config();
 app.use(express.json());
 
 app.use("/api", router);
@@ -52,11 +53,12 @@ if (process.env.NODE_ENV === "production") {
 // });
 
 // *** Connection with Database ***
+
+// console.log(process.env.MONGO_URL);
+// console.log(process.env.SMTP_EMAIL);
 const server = app.listen(5000, () => {
   mongoose
-    .connect(
-      "mongodb+srv://hanss9545:yHzKqKRSeBnIsR3b@cluster0.4gqosjj.mongodb.net/MegaTalk"
-    )
+    .connect(process.env.MONGO_URL)
     .then(() => {
       console.log(`Example app listening on port 5000`);
     })

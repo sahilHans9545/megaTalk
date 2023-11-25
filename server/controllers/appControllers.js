@@ -3,7 +3,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
 const asyncHandler = require("express-async-handler");
+const dotenv = require("dotenv");
+
 const sendMail = require("../utils/sendMail");
+dotenv.config();
 // console.log(User);
 
 const verifyUser = async (req, res, next) => {
@@ -45,7 +48,7 @@ const verifyUserAccount = async (req, res) => {
 
   try {
     // Verify the token
-    const decodedToken = jwt.verify(token, "uiyiurwytjuhiu");
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
     // Check if the user ID from the token matches the request
     if (decodedToken.userId !== id) {
@@ -99,7 +102,7 @@ const register = async (req, res) => {
           userId: newUser._id,
           username: newUser.username,
         },
-        "uiyiurwytjuhiu",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
@@ -185,7 +188,7 @@ const login = async (req, res) => {
           userId: user._id,
           username: user.username,
         },
-        "uiyiurwytjuhiu",
+        process.env.JWT_SECRET,
         { expiresIn: "24h" }
       );
 
@@ -203,7 +206,7 @@ const login = async (req, res) => {
         userId: user._id,
         username: user.username,
       },
-      "uiyiurwytjuhiu",
+      process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
