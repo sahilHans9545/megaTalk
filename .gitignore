@@ -11,9 +11,9 @@ server/node_modules/
 logs/
 *.log
 
-# Ignore build artifacts
-/build
-/dist
+# # Ignore build artifacts
+# /build
+# /dist
 
 # Ignore any OS or editor-specific files
 .DS_Store
