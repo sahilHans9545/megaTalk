@@ -119,7 +119,7 @@ const register = async (req, res) => {
 
       await newUser.save();
 
-      const url = `http://localhost:5173/user/${newUser._id}/verify/${verificationToken}`;
+      const url = `https://megatalk.onrender.com/user/${newUser._id}/verify/${verificationToken}`;
       await sendMail(newUser.email, "Verify Email", url);
 
       // console.log(newUser);
@@ -163,7 +163,7 @@ const resendVerificationEmail = async (req, res) => {
     user.verificationToken = newVerificationToken;
     await user.save();
 
-    const url = `http://localhost:5173/user/${user._id}/verify/${newVerificationToken}`;
+    const url = `https://megatalk.onrender.com/user/${user._id}/verify/${newVerificationToken}`;
     await sendMail(user.email, "Verify Email", url);
 
     res.status(200).json({ message: "Verification email resent" });
