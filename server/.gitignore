@@ -1,8 +1,7 @@
 # .gitignore
 
 # Ignore node_modules for both frontend and server
-frontEnd/node_modules/
-server/node_modules/
+node_modules
 
 # Ignore environment files
 *.env
@@ -11,9 +10,6 @@ server/node_modules/
 logs/
 *.log
 
-# Ignore build artifacts
-/build
-/dist
 
 # Ignore any OS or editor-specific files
 .DS_Store
