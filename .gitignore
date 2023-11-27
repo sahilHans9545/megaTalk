@@ -1,0 +1,22 @@
+# .gitignore
+
+# Ignore node_modules for both frontend and server
+frontEnd/node_modules/
+server/node_modules/
+
+# Ignore environment files
+*.env
+
+# Ignore logs and other generated files
+logs/
+*.log
+
+# Ignore build artifacts
+/build
+/dist
+
+# Ignore any OS or editor-specific files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
