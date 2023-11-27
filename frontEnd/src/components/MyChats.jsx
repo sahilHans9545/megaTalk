@@ -34,7 +34,7 @@ const MyChats = () => {
       };
 
       const { data } = await axios.get(
-        "http://localhost:5000/api/chat",
+        "https://megatalkbackend.onrender.com/api/chat",
         config
       );
 

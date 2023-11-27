@@ -25,7 +25,7 @@ const EmailVerify = () => {
   useEffect(() => {
     const verifyEmailUrl = async () => {
       try {
-        const url = `http://localhost:5000/api/user/${param.id}/verify/${param.token}`;
+        const url = `https://megatalkbackend.onrender.com/api/user/${param.id}/verify/${param.token}`;
         const { data } = await axios.get(url);
         handleLogOut();
         console.log(data);

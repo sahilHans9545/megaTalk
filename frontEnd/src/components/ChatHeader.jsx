@@ -31,7 +31,7 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
       };
 
       const { data } = await axios.get(
-        `http://localhost:5000/api/emptyChat/${selectedChat._id}`,
+        `https://megatalkbackend.onrender.com/api/emptyChat/${selectedChat._id}`,
         config
       );
       console.log("DATA FROM SERVER", data);

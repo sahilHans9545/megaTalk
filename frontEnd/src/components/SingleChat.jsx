@@ -57,7 +57,7 @@ const SingleChat = () => {
       setLoading(true);
 
       const { data } = await axios.get(
-        `http://localhost:5000/api/message/${selectedChat._id}`,
+        `https://megatalkbackend.onrender.com/api/message/${selectedChat._id}`,
         config
       );
       // setMessages(data);
@@ -85,7 +85,7 @@ const SingleChat = () => {
         setNewMessage("");
 
         const { data } = await axios.post(
-          "http://localhost:5000/api/message",
+          "https://megatalkbackend.onrender.com/api/message",
           {
             content: newMessage,
             chatId: selectedChat._id,

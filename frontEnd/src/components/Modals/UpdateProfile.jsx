@@ -46,7 +46,7 @@ const Profile = () => {
 
       console.log("DATA S", data);
 
-      const url = `http://localhost:5000/api/updateuser?id=${user._id}`;
+      const url = `https://megatalkbackend.onrender.com/api/updateuser?id=${user._id}`;
 
       const config = {
         headers: {

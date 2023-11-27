@@ -25,7 +25,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const url = "http://localhost:5000/api/resendMail";
+      const url = "https://megatalkbackend.onrender.com/api/resendMail";
       const data = {
         username: username,
       };
@@ -49,7 +49,7 @@ const Login = () => {
   const handleSubmit = async () => {
     setLoading(true);
 
-    const url = "http://localhost:5000/api/login";
+    const url = "https://megatalkbackend.onrender.com/api/login";
     const data = {
       username,
       password,

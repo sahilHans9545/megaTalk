@@ -22,7 +22,7 @@ const SignUp = () => {
 
   const handleSubmit = () => {
     setLoading(true);
-    const url = "http://localhost:5000/api/register";
+    const url = "https://megatalkbackend.onrender.com/api/register";
     const data = {
       username,
       email,

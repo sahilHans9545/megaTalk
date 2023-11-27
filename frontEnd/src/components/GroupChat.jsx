@@ -27,7 +27,7 @@ const GroupChat = () => {
         },
       };
       const { data } = await axios.put(
-        `http://localhost:5000/api/group/removeUser`,
+        `https://megatalkbackend.onrender.com/api/group/removeUser`,
         {
           chatId: selectedChat._id,
           userId: userData._id,
