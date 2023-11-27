@@ -27,16 +27,15 @@ const verifyUser = async (req, res, next) => {
 //@route           GET /api/user?search=
 //@access          private
 const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { username: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
-
-  const users = await User.find(keyword).find({
+  if (req.query.search === "") {
+    res.send([]);
+  }
+  const users = await User.find({
+    $or: [
+      { username: { $regex: req.query.search, $options: "i" } },
+      { email: { $regex: req.query.search, $options: "i" } },
+    ],
+  }).find({
     _id: { $ne: req.user.userId },
   });
   res.send(users);
@@ -44,37 +43,44 @@ const allUsers = asyncHandler(async (req, res) => {
 
 const verifyUserAccount = async (req, res) => {
   const { id, token } = req.params;
-  console.log(req.params);
 
   try {
-    // Verify the token
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check if the user ID from the token matches the request
-    if (decodedToken.userId !== id) {
-      console.log(decodedToken.userId);
-      console.log(id);
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    // Check if the user exists
     const user = await User.findById(id);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check if the user is already verified
-    if (user.verified) {
-      return res.status(400).json({ message: "User already verified" });
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Check if the user ID from the token matches the request
+    if (decodedToken.userId !== user._id.toString()) {
+      console.log(decodedToken);
+      console.log(user._id);
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Mark the user as verified
+    // Check if the user is already verified
+    if (user.verified) {
+      return res
+        .status(400)
+        .json({ message: "User already verified", user: user });
+    }
+
+    // Check if the verification token matches the one stored in the user document
+    if (token !== user.verificationToken) {
+      return res.status(401).json({ message: "Invalid verification token" });
+    }
+
+    // Mark the user as verified and clear the verification token
     user.verified = true;
+    user.verificationToken = "";
     await user.save();
 
     res.json({ message: "User verified successfully" });
   } catch (error) {
     console.error(error);
+
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -90,6 +96,8 @@ const register = async (req, res) => {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
+      // Generate a unique verification token
+
       const newUser = await User.create({
         username,
         email,
@@ -97,16 +105,21 @@ const register = async (req, res) => {
         profilePic,
       });
 
-      const token = jwt.sign(
+      const verificationToken = jwt.sign(
         {
           userId: newUser._id,
-          username: newUser.username,
+          username,
+          email,
         },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
-      const url = `http://localhost:5173/user/${newUser._id}/verify/${token}`;
+      newUser.verificationToken = verificationToken;
+
+      await newUser.save();
+
+      const url = `http://localhost:5173/user/${newUser._id}/verify/${verificationToken}`;
       await sendMail(newUser.email, "Verify Email", url);
 
       // console.log(newUser);
@@ -122,50 +135,45 @@ const register = async (req, res) => {
   }
 };
 
-// const login = async (req, res) => {
-//   try {
-//     const { username, password } = req.body;
-//     User.findOne({ username })
-//       .then((user) => {
-//         // if(!user.verified){
-//         //    res.status
-//         // }
-//         bcrypt
-//           .compare(password, user.password)
-//           .then((passwordCheck) => {
-//             if (!passwordCheck)
-//               return res
-//                 .status(400)
-//                 .send({ error: "Password doesn't Matched...!" });
-//             const token = jwt.sign(
-//               {
-//                 userId: user._id,
-//                 username: user.username,
-//               },
-//               "uiyiurwytjuhiu",
-//               { expiresIn: "24h" }
-//             );
+const resendVerificationEmail = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = await User.findOne({ username });
 
-//             return res.status(200).json({
-//               msg: "Login Successful...",
-//               username: user.username,
-//               token: token,
-//             });
-//           })
-//           .catch((err) => {
-//             return res
-//               .status(400)
-//               .send({ error: "Password doesn't Matched...!" });
-//           });
-//       })
-//       .catch((err) => {
-//         return res.status(404).send({ error: "Username not found." });
-//       });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send(error);
-//   }
-// };
+    if (!user) {
+      return res.status(404).json({ message: "User not found", status: "no" });
+    }
+
+    if (user.verified) {
+      return res
+        .status(400)
+        .json({ message: "User already verified", status: "no" });
+    }
+
+    const newVerificationToken = jwt.sign(
+      {
+        userId: user._id,
+        username: user.username,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // Update the user's verification token in the database
+    user.verificationToken = newVerificationToken;
+    await user.save();
+
+    const url = `http://localhost:5173/user/${user._id}/verify/${newVerificationToken}`;
+    await sendMail(user.email, "Verify Email", url);
+
+    res.status(200).json({ message: "Verification email resent" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+};
 
 const login = async (req, res) => {
   try {
@@ -183,20 +191,8 @@ const login = async (req, res) => {
     }
 
     if (!user.verified) {
-      const token = jwt.sign(
-        {
-          userId: user._id,
-          username: user.username,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-
-      const url = `http://localhost:5000/api/user/${user._id}/verify/${token}`;
-      await sendMail(user.email, "Verify Email", url);
-
       return res.status(401).json({
-        message: "User not verified. Another verification email has been sent.",
+        message: "resendEmail",
       });
     }
 
@@ -336,6 +332,7 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   verifyUserAccount,
+  resendVerificationEmail,
   register,
   login,
   generateOtp,

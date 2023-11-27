@@ -5,7 +5,7 @@ export const getUser = (username) => {
     .get(`http://localhost:5000/api/getUser/${username}`)
     .then((response) => {
       // Handle the successful response
-      console.log("salu", response.data);
+      // console.log("salu", response.data);
       return response.data;
     })
     .catch((error) => {

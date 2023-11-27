@@ -6,10 +6,42 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedChat } from "../store/slices/chatSlice";
 import { setModalType } from "../store/slices/modalSlice";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const GroupChat = () => {
   const selectedChat = useSelector((state) => state.chatData.selectedChat);
+  const { userData, userInfo } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
+  const leaveGroup = async () => {
+    if (selectedChat.groupAdmin._id === userData._id) {
+      toast("You are an Admin..");
+      return;
+    }
+    try {
+      // setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `http://localhost:5000/api/group/removeUser`,
+        {
+          chatId: selectedChat._id,
+          userId: userData._id,
+        },
+        config
+      );
+      toast.success(`You left the Group successfully!`);
+      // console.log("DATA", data);
+      dispatch(setSelectedChat(""));
+    } catch (error) {
+      toast.error("Error Occured!");
+      // setLoading(false);
+    }
+  };
   return (
     <div>
       <div className="flex items-center justify-between gap-9 bg-[#27313D] text-white py-2 px-10 shadow-inner">
@@ -33,15 +65,23 @@ const GroupChat = () => {
           </span>
         </div>
         <div className="flex items-center gap-4 relative">
-          <VisibilityIcon
-            className="cursor-pointer"
-            onClick={() => dispatch(setModalType("updateGroup"))}
-          />
+          {selectedChat.groupAdmin._id === userData._id && (
+            <VisibilityIcon
+              className="cursor-pointer"
+              onClick={() => dispatch(setModalType("updateGroup"))}
+            />
+          )}
+
           <InfoIcon
             className="cursor-pointer"
             onClick={() => dispatch(setModalType("groupAbout"))}
           />
-          <ExitToAppIcon className="text-red-500 cursor-pointer" />
+          {selectedChat.groupAdmin._id !== userData._id && (
+            <ExitToAppIcon
+              className="text-red-500 cursor-pointer"
+              onClick={() => leaveGroup()}
+            />
+          )}
         </div>
       </div>
     </div>

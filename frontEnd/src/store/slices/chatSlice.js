@@ -5,6 +5,8 @@ const chatSlice = createSlice({
   initialState: {
     chats: [],
     selectedChat: "",
+    fetchAgain: false,
+    messages: [],
   },
   //   initialState: [],
   reducers: {
@@ -14,11 +16,23 @@ const chatSlice = createSlice({
     setSelectedChat(state, action) {
       return { ...state, selectedChat: action.payload };
     },
+    setFetchAgain(state, action) {
+      return { ...state, fetchAgain: action.payload };
+    },
+    setMessages(state, action) {
+      return { ...state, messages: action.payload };
+    },
     clearChat(state, action) {
       return {};
     },
   },
 });
-export const { setChats, setSelectedChat, clearChat } = chatSlice.actions;
+export const {
+  setChats,
+  setSelectedChat,
+  setFetchAgain,
+  clearChat,
+  setMessages,
+} = chatSlice.actions;
 
 export { chatSlice };

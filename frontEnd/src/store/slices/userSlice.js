@@ -23,8 +23,8 @@ const userSlice = createSlice({
     },
   },
 });
-console.log(userSlice);
-console.log(userSlice.actions);
+// console.log(userSlice);
+// console.log(userSlice.actions);
 export const { setUser, logOut } = userSlice.actions;
 
 export { userSlice };

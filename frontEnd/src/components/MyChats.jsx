@@ -12,16 +12,17 @@ import { logOut } from "../store/slices/userSlice";
 import { Oval } from "react-loader-spinner";
 
 const MyChats = () => {
-  const userInfo = useSelector((state) => state.user.userInfo);
-  const userData = useSelector((state) => state.user.userData);
-  const chats = useSelector((state) => state.chatData.chats);
+  const { userInfo, userData } = useSelector((state) => state.user);
+  // const userData = useSelector((state) => state.user.userData);
   const [displayChats, setDisplayChats] = useState([]);
-  const selectedChat = useSelector((state) => state.chatData.selectedChat);
+  const { chats, fetchAgain, selectedChat } = useSelector(
+    (state) => state.chatData
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  console.log("CHAT DATA ", chats);
+  // console.log("CHAT DATA ", chats);
   const fetchChats = async () => {
     // console.log(user._id);
     setLoading(true);
@@ -41,24 +42,26 @@ const MyChats = () => {
       dispatch(setChats(data));
       setLoading(false);
 
-      console.log("FETCED CHATS ARE = ", data);
+      // console.log("FETCED CHATS ARE = ", data);
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error.response?.status === 401) {
         console.log(error);
         toast.error("Your session time out!");
         localStorage.removeItem("userInfo");
         dispatch(logOut());
         navigate("/");
-        console.log("NEW ERROR ", error);
       } else {
-        toast(error.response.data.error);
+        toast(error.response?.data.error);
       }
     }
   };
 
   useEffect(() => {
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
+  // useEffect(() => {
+  //   fetchChats();
+  // }, []);
   return (
     <div
       className={`bg-[#2C3544] dark:bg-dark-primary h-full  pt-7 pb-11 relative flex flex-col  `}
@@ -114,7 +117,7 @@ const MyChats = () => {
                 return (
                   <li
                     className={`flex gap-5 items-center py-2 px-4 cursor-pointer ${
-                      selectedChat === userChat
+                      selectedChat?._id === userChat?._id
                         ? "  dark:shadow-md shadow-sm shadow-color2 bg-[#817c7c6b] dark:bg-dark-grayish"
                         : ""
                     } border-b-2 border-[#384453]`}

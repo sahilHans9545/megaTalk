@@ -8,6 +8,7 @@ import { setModalType } from "../../store/slices/modalSlice";
 import About from "./About";
 import UserProfile from "./UserProfile";
 import LoggedProfile from "./LoggedProfile";
+import Wallpaper from "./wallpaper";
 
 const Modal = () => {
   const modalType = useSelector((state) => state.modalType);
@@ -26,6 +27,7 @@ const Modal = () => {
       {modalType === "About" && <About />}
       {modalType === "userProfile" && <UserProfile />}
       {modalType === "LoggedUserProfile" && <LoggedProfile />}
+      {modalType === "wallpaper" && <Wallpaper />}
     </div>
   );
 };

@@ -11,39 +11,22 @@ import { toast } from "react-toastify";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [File, setFile] = useState("");
+  // const [File, setFile] = useState("");
+  const [pic, setPic] = useState("");
   const [username, setUsername] = useState();
   const [email, SetEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [picLoading, setPicLoading] = useState(false);
   const dispatch = useDispatch();
-
-  // const userD = getUser(data.username);
-  // let userDATA = "";
-
-  // userD
-  //   .then((userData) => {
-  //     console.log("USR DATA IS ", userData);
-  //     userDATA = userData;
-  //     dispatch(
-  //       setUser({ isLoggedIn: true, userInfo: data, userData: userDATA })
-  //     );
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error:", error);
-  //     dispatch(
-  //       setUser({ isLoggedIn: true, userInfo: data, userData: userDATA })
-  //     );
-  //   });
 
   const handleSubmit = () => {
     setLoading(true);
-
     const url = "http://localhost:5000/api/register";
     const data = {
       username,
       email,
-      profilePic: File,
+      profilePic: pic,
       password,
     };
 
@@ -65,25 +48,72 @@ const SignUp = () => {
         setLoading(false);
       });
   };
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const filereader = new FileReader(file);
-      filereader.readAsDataURL(file);
-      filereader.onload = () => {
-        resolve(filereader.result);
-      };
-      // filereader.onerror((err) => reject(err));
-      filereader.onerror = (err) => {
-        reject(err);
-      };
-    });
+
+  const postDetails = (pics) => {
+    setPicLoading(true);
+    if (pics === undefined) {
+      toast.warn("Please Select an Image!");
+      return;
+    }
+    console.log(pics);
+    if (
+      pics.type === "image/jpeg" ||
+      pics.type === "image/png" ||
+      pics.type === "image/jpg"
+    ) {
+      const data = new FormData();
+      console.log("FORMDATA", data);
+      data.append("file", pics);
+      data.append("upload_preset", "MegaTalk");
+      data.append("cloud_name", "dfl5ed5gw");
+      console.log("UP", data);
+      fetch("https://api.cloudinary.com/v1_1/dfl5ed5gw/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("data", data);
+          setPic(data.url);
+          console.log(data.url);
+          setPicLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setPicLoading(false);
+        });
+    } else {
+      toast({
+        title: "Please Select an Image!",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setPicLoading(false);
+      return;
+    }
   };
 
-  const onUpload = async (e) => {
-    console.log(e.target.files[0]);
-    const base64 = await convertToBase64(e.target.files[0]);
-    setFile(base64);
-  };
+  // const convertToBase64 = (file) => {
+  //   return new Promise((resolve, reject) => {
+  //     const filereader = new FileReader(file);
+  //     filereader.readAsDataURL(file);
+  //     filereader.onload = () => {
+  //       resolve(filereader.result);
+  //     };
+  //     // filereader.onerror((err) => reject(err));
+  //     filereader.onerror = (err) => {
+  //       reject(err);
+  //     };
+  //   });
+  // };
+
+  // const onUpload = async (e) => {
+  //   console.log(e.target.files[0]);
+  //   const base64 = await convertToBase64(e.target.files[0]);
+  //   setFile(base64);
+  // };
   return (
     <div>
       <form onSubmit={(e) => e.preventDefault()}>
@@ -93,7 +123,7 @@ const SignUp = () => {
             className="block mb-2 text-sm font-medium text-gray-900 cursor-pointer "
           >
             <img
-              src={File || userImg}
+              src={pic || userImg}
               alt=""
               className={`w-[140px] h-[140px] object-cover rounded-full ${
                 File ? "shadow-xl" : ""
@@ -105,7 +135,8 @@ const SignUp = () => {
             id="profile"
             placeholder="Enter your image"
             className="hidden "
-            onChange={onUpload}
+            // onChange={onUpload}
+            onChange={(e) => postDetails(e.target.files[0])}
           />
         </div>
         <div className="mb-3">
@@ -175,7 +206,7 @@ const SignUp = () => {
           </div>
         </div>
 
-        {!loading ? (
+        {!loading && !picLoading ? (
           <div>
             <button
               type="submit"

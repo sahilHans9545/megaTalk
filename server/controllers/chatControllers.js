@@ -121,6 +121,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
 // @route   PUT /api/chat/rename
 // @access  Protected
 const renameGroup = asyncHandler(async (req, res) => {
+  console.log("I AM HERE");
   const { chatId, chatName } = req.body;
 
   const updatedChat = await Chat.findByIdAndUpdate(
@@ -199,6 +200,66 @@ const addToGroup = asyncHandler(async (req, res) => {
   }
 });
 
+const chatWallpaper = asyncHandler(async (req, res) => {
+  const { chatId, wallpaper } = req.body;
+  console.log("CHECK ", req.user.userId);
+  console.log(wallpaper);
+
+  // check if the requester is admin
+
+  const addWallpaper = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      wallpaper,
+    },
+    {
+      new: true,
+    }
+  ).populate("users", "-password");
+
+  if (!addWallpaper) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(addWallpaper);
+  }
+});
+
+// const sendNotification = asyncHandler(async (req, res) => {
+//   try {
+//     const { receiverId, updatedAt, chatId } = req.body;
+
+//     let user = await User.findOne({ _id: receiverId });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     // Check if a notification with the given chatId already exists
+//     const existingNotification = user.notifications.find(
+//       (notification) => notification.chatId === chatId
+//     );
+
+//     if (existingNotification) {
+//       existingNotification.count += 1;
+//       existingNotification.updatedAt = updatedAt;
+//     } else {
+//       user.notifications.push({
+//         username: req.user.username,
+//         count: 1,
+//         chatId,
+//         updatedAt: updatedAt,
+//       });
+//     }
+//     user.notifications.sort((a, b) => b.updatedAt - a.updatedAt);
+//     await user.save();
+//     res.status(200).json({ message: "Notifications send" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// });
+
 module.exports = {
   accessChat,
   fetchChats,
@@ -206,4 +267,6 @@ module.exports = {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  chatWallpaper,
+  // sendNotification,
 };

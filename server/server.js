@@ -83,7 +83,12 @@ io.on("connection", (socket) => {
   console.log("Connected to socket.io");
   socket.on("setup", (userData) => {
     socket.join(userData._id);
-    console.log("USERID ", userData._id);
+    console.log(
+      "******  USERID ******",
+      userData._id,
+      " *** USERNAME ***",
+      userData.username
+    );
     socket.emit("connected");
   });
 
@@ -99,9 +104,24 @@ io.on("connection", (socket) => {
     if (!chat.users) return console.log("chat.users not defined");
 
     chat.users.forEach((user) => {
+      console.log("*******", user.username, "********");
       if (user._id == newMessageRecieved.sender._id) return;
 
       socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
+  });
+
+  socket.on("wallpaper change", (chat, senderId) => {
+    // var chat = newMessageRecieved.chat;
+    // console.log(newMessageRecieved.content);
+    console.log("WALLPAPER CHANGED BY", senderId);
+
+    if (!chat.users) return console.log("chat.users not defined");
+
+    chat.users.forEach((user) => {
+      if (user._id == senderId) return;
+
+      socket.in(user._id).emit("wallpaper changed", chat);
     });
   });
 

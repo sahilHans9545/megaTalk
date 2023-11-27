@@ -30,6 +30,7 @@ const GroupAbout = () => {
           return (
             <UserSearchItem
               username={user.username}
+              admin={selectedChat.groupAdmin.username}
               email={user.email}
               profile={user.profilePic}
               key={user._id}

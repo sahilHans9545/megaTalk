@@ -8,6 +8,8 @@ const {
   removeFromGroup,
   addToGroup,
   renameGroup,
+  chatWallpaper,
+  // sendNotification,
 } = require("../controllers/chatControllers.js");
 
 const {
@@ -20,9 +22,10 @@ const AuthObj = require("../middlewares/auth");
 
 /** POST Methods */
 
-router.route("/user/:id/verify/:token").get(controller.verifyUserAccount); // register user
+router.route("/user/:id/verify/:token").get(controller.verifyUserAccount); // user Account verification
 router.route("/register").post(controller.register); // register user
 router.route("/login").post(controller.login); // login in app
+router.route("/resendMail").post(controller.resendVerificationEmail); // Resend mail for veritfication
 
 /*GET Methods */
 router.route("/getuser/:username").get(controller.getUser); // user with username
@@ -41,11 +44,14 @@ router
 
 router.route("/user").get(AuthObj.Auth, controller.allUsers);
 router.route("/chat").post(AuthObj.Auth, accessChat);
+// router.route("/send_notification").post(AuthObj.Auth, sendNotification);
 router.route("/chat").get(AuthObj.Auth, fetchChats);
 router.route("/chat/group").post(AuthObj.Auth, createGroupChat);
 router.route("/chat/rename").put(AuthObj.Auth, renameGroup);
+router.route("/chat/wallpaper").put(AuthObj.Auth, chatWallpaper);
 router.route("/group/removeUser").put(AuthObj.Auth, removeFromGroup);
 router.route("/group/addUser").put(AuthObj.Auth, addToGroup);
+// router.route("/group/leave").put(AuthObj.Auth, leaveGroup);
 
 router.route("/message/:chatId").get(AuthObj.Auth, allMessages);
 router.route("/message").post(AuthObj.Auth, sendMessage);

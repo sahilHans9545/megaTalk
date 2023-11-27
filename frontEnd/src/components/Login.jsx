@@ -18,7 +18,33 @@ const Login = () => {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendBtn, setResendBtn] = useState(false);
   const rememberRef = useRef(null);
+
+  const resendMail = async () => {
+    setLoading(true);
+
+    try {
+      const url = "http://localhost:5000/api/resendMail";
+      const data = {
+        username: username,
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      const response = await axios.post(url, data, { headers });
+      toast.success(response.data.message);
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+      setLoading(false);
+      console.log(error);
+    } finally {
+      setResendBtn(false);
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -57,62 +83,15 @@ const Login = () => {
 
       navigate("/chats");
     } catch (error) {
+      if (error.response?.data?.message === "resendEmail") {
+        setResendBtn(true);
+      }
       console.error("Error:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
-
-  // const handleSubmit = () => {
-  //   setLoading(true);
-  //   const url = "http://localhost:5000/api/login";
-  //   const data = {
-  //     username,
-  //     password,
-  //   };
-
-  //   const headers = {
-  //     "Content-Type": "application/json",
-  //   };
-  //   setLoading(true);
-  //   axios
-  //     .post(url, data, { headers })
-  //     .then((response) => {
-  //       console.log("Response:", response);
-  //       let data = {
-  //         username: response.data.username,
-  //         token: response.data.token,
-  //       };
-  //       console.log(rememberRef);
-  //       localStorage.setItem("userInfo", JSON.stringify(data));
-  //       const userD = getUser(data.username);
-  //       let userDATA = "";
-
-  //       userD
-  //         .then((userData) => {
-  //           console.log("USR DATA IS ", userData);
-  //           userDATA = userData;
-  //           dispatch(
-  //             setUser({ isLoggedIn: true, userInfo: data, userData: userDATA })
-  //           );
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error:", error);
-  //           dispatch(
-  //             setUser({ isLoggedIn: true, userInfo: data, userData: userDATA })
-  //           );
-  //         });
-  //       setLoading(false);
-  //       navigate("/chats");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error.response.data);
-  //       setLoading(false);
-  //       toast.error(error.response.data.message);
-  //     });
-  //   setLoading(false);
-  // };
 
   return (
     <div>
@@ -186,19 +165,16 @@ const Login = () => {
           </label>
         </div>
         {loading === false ? (
-          <div>
+          <div className="">
             <button
               type="submit"
               className=" w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm   px-5 py-2.5 text-center "
             >
-              {/* {!loading ? ( */}
               Login
-              {/* ) : ( */}
-              {/* )} */}
             </button>
           </div>
         ) : (
-          <span className="">
+          <div className="flex justify-center">
             <Oval
               height={25}
               width={25}
@@ -211,8 +187,9 @@ const Login = () => {
               strokeWidth={2}
               strokeWidthSecondary={2}
             />
-          </span>
+          </div>
         )}
+
         {/* <div className="mt-3">
           <button
             type="submit"
@@ -228,6 +205,16 @@ const Login = () => {
           </Link>
         </p> */}
       </form>
+      {resendBtn && (
+        <div className="mt-4">
+          <button
+            onClick={resendMail}
+            className=" w-full bg-green-500 text-white  font-medium rounded-lg text-sm   px-5 py-2.5 text-center "
+          >
+            Resend Email Verification Link
+          </button>
+        </div>
+      )}
     </div>
   );
 };

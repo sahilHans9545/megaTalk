@@ -47,7 +47,7 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
     <div className="flex items-center justify-between gap-9 bg-white dark:text-white dark:bg-dark-grayish  py-2 px-4 lg:px-10 shadow-2xl">
       <div className="flex items-center gap-3">
         <span
-          className="bg-slate-600 p-1 text-white rounded-lg md:hidden mr-1 "
+          className="bg-slate-600 p-1 text-white rounded-lg md:hidden mr-1 cursor-pointer "
           onClick={() => dispatch(setSelectedChat(""))}
         >
           <KeyboardBackspaceIcon
@@ -111,7 +111,13 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
                 </span>
                 <span className="font-medium ">Empty Chat</span>
               </li>
-              <li className="cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-grayish px-5 py-2.5">
+              <li
+                className="cursor-pointer hover:bg-gray-200 dark:hover:bg-dark-grayish px-5 py-2.5"
+                onClick={() => {
+                  setShowMenu(false);
+                  dispatch(setModalType("wallpaper"));
+                }}
+              >
                 <span className="w-12 inline-block">
                   <ImageIcon className="text-gray-600 dark:text-gray-50" />
                 </span>

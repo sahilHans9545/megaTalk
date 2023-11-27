@@ -1,17 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import QuickreplyIcon from "@mui/icons-material/Quickreply";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import logo from "../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { setModalType } from "../store/slices/modalSlice";
+import { getSender } from "../config/chaLogics";
+import { setSelectedChat } from "../store/slices/chatSlice";
+import { setNotifications } from "../store/slices/notificationSlice";
 
 const Header = ({ setShowSideDrawer }) => {
   const userData = useSelector((state) => state.user?.userData);
-  const { themeColor } = useSelector((state) => state.theme);
+  const notifications = useSelector((state) => state.notification);
+  const [showNotification, setShowNotification] = useState(false);
+
   const dispatch = useDispatch();
-  console.log("DUDE I AM HEADER");
+
   return (
     <div
       className={`bg-color1 border-[5px]  border-color7 flex justify-between items-center py-2.5 px-5 sm:px-10`}
@@ -30,7 +34,75 @@ const Header = ({ setShowSideDrawer }) => {
         {/* <QuickreplyIcon className="text-blue-500" /> */}
       </div>
       <div className="flex items-center gap-3 sm:gap-4">
-        <NotificationsIcon />
+        <div className="relative">
+          <div
+            className=" cursor-pointer"
+            onClick={() => setShowNotification(!showNotification)}
+          >
+            <NotificationsIcon style={{ fontSize: "27px" }} />
+            {notifications?.length > 0 && (
+              <span className="w-[18px] h-[18px] px-0.5 rounded-full text-center text-white text-xs bg-red-500 absolute -right-1 -top-[5px]">
+                {notifications.length > 9 ? "9+" : notifications.length}
+              </span>
+            )}
+          </div>
+          {showNotification && (
+            <div className="bg-white w-80 h-max-[500px] absolute z-[1] -left-[40px] top-[150%] shadow-2xl">
+              {!notifications?.length ? (
+                <p className=" px-4 py-2">No new Notifications</p>
+              ) : (
+                <div>
+                  <p className="py-2 text-center ">
+                    {" "}
+                    {`${notifications.length} messages`}
+                  </p>
+                  <ul className="mt-1">
+                    {notifications.map((nofc, id) => {
+                      return (
+                        <li
+                          key={id}
+                          className="py-2 bg-gray-100 px-5 cursor-pointer border-b-2 hover:bg-gray-300"
+                          onClick={() => {
+                            setShowNotification(false);
+                            dispatch(setSelectedChat(nofc.chat));
+                            dispatch(
+                              setNotifications(
+                                notifications.filter(
+                                  (N) => N.chat._id !== nofc.chat._id
+                                )
+                              )
+                            );
+                          }}
+                        >
+                          {nofc.chat.isGroupChat ? (
+                            <span className="flex items-center gap-3">
+                              {" "}
+                              <span className="bg-color6 text-white  w-5 h-5 rounded-full flex justify-center items-center ">
+                                {nofc.count}
+                              </span>{" "}
+                              New {nofc.count > 1 ? "Messages" : "Message"} in{" "}
+                              {nofc.chat.chatName}
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-3">
+                              {" "}
+                              <span className="bg-color6 text-white w-5 h-5 rounded-full  flex justify-center items-center">
+                                {nofc.count}
+                              </span>{" "}
+                              New {nofc.count > 1 ? "Messages" : "Message"} in{" "}
+                              {getSender(userData, nofc.chat.users)}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="w-10 h-10 bg-gray-300 rounded-full">
           <img
             src={userData.profilePic}
