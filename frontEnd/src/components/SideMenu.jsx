@@ -48,6 +48,8 @@ const SideMenu = () => {
   const [showThemePalette, setShowThemePalette] = useState(false);
   const { siteMode } = useSelector((state) => state.theme);
   const [menuType, setMenuType] = useState("chat");
+  const modalType = useSelector((state) => state.modalType);
+  const { selectedChat } = useSelector((state) => state.chatData);
 
   const handleLogOut = () => {
     dispatch(logOut());
@@ -56,11 +58,13 @@ const SideMenu = () => {
     dispatch(clearTheme());
 
     navigate("/");
-
-    // alert("Log out");
   };
   return (
-    <div className="bg-[#27313D] dark:bg-dark-grayish text-[#c8c8c8] px-1 sm:px-1.5 text-center py-7 flex flex-col items-center relative">
+    <div
+      className={`${
+        selectedChat ? "hidden md:flex" : ""
+      } bg-[#27313D] dark:bg-dark-grayish text-[#c8c8c8]  text-center sm:px-1.5  flex flex-col items-center  overflow-auto shrink-0 fixed sm:relative bottom-0 h-full px-1 py-7 left-0 `}
+    >
       <ul className="flex flex-col gap-3 flex-1">
         <li
           className={`flex flex-col items-center cursor-pointer px-1.5 py-1.5 hover:bg-dark-secondary ${

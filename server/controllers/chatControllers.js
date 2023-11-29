@@ -205,6 +205,14 @@ const chatWallpaper = asyncHandler(async (req, res) => {
   console.log("CHECK ", req.user.userId);
   console.log(wallpaper);
 
+  const validUser = await Chat.find({
+    chatId,
+    users: { $elemMatch: { $eq: req.user.userId } },
+  });
+  if (!validUser) {
+    res.status(400).send({ message: "Not a Authorized user." });
+  }
+
   // check if the requester is admin
 
   const addWallpaper = await Chat.findByIdAndUpdate(
@@ -222,6 +230,35 @@ const chatWallpaper = asyncHandler(async (req, res) => {
     throw new Error("Chat Not Found");
   } else {
     res.json(addWallpaper);
+  }
+});
+
+const clearWallpaper = asyncHandler(async (req, res) => {
+  const { chatId } = req.body;
+
+  const validUser = await Chat.find({
+    chatId,
+    users: { $elemMatch: { $eq: req.user.userId } },
+  });
+  if (!validUser) {
+    res.status(400).json({ message: "Not a Authorized user." });
+  }
+
+  const defaultWallpaper = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      wallpaper: "",
+    },
+    {
+      new: true,
+    }
+  ).populate("users", "-password");
+
+  if (!defaultWallpaper) {
+    res.status(404).send({ message: "Not found" });
+    throw new Error("Chat Not Found");
+  } else {
+    res.json(defaultWallpaper);
   }
 });
 
@@ -268,5 +305,6 @@ module.exports = {
   addToGroup,
   removeFromGroup,
   chatWallpaper,
+  clearWallpaper,
   // sendNotification,
 };

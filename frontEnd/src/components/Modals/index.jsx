@@ -9,8 +9,8 @@ import About from "./About";
 import UserProfile from "./UserProfile";
 import LoggedProfile from "./LoggedProfile";
 import Wallpaper from "./wallpaper";
-
-const Modal = () => {
+import SideMenu from "../SideMenu";
+const Modal = ({ socket }) => {
   const modalType = useSelector((state) => state.modalType);
   const dispatch = useDispatch();
 
@@ -27,7 +27,8 @@ const Modal = () => {
       {modalType === "About" && <About />}
       {modalType === "userProfile" && <UserProfile />}
       {modalType === "LoggedUserProfile" && <LoggedProfile />}
-      {modalType === "wallpaper" && <Wallpaper />}
+      {modalType === "wallpaper" && <Wallpaper socket={socket} />}
+      {modalType === "mobileSideMenu" && <SideMenu />}
     </div>
   );
 };

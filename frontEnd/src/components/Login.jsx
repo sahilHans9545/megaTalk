@@ -15,7 +15,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState();
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendBtn, setResendBtn] = useState(false);
@@ -25,7 +25,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const url = "https://megatalkbackend.onrender.com/api/resendMail";
+      const url = "https://localhost:5000/api/resendMail";
       const data = {
         username: username,
       };
@@ -49,7 +49,7 @@ const Login = () => {
   const handleSubmit = async () => {
     setLoading(true);
 
-    const url = "https://megatalkbackend.onrender.com/api/login";
+    const url = "http://localhost:5000/api/login";
     const data = {
       username,
       password,

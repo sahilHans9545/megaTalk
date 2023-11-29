@@ -8,23 +8,27 @@ import { setModalType } from "../store/slices/modalSlice";
 import { getSender } from "../config/chaLogics";
 import { setSelectedChat } from "../store/slices/chatSlice";
 import { setNotifications } from "../store/slices/notificationSlice";
+import userImg from "../assets/user.png";
 
 const Header = ({ setShowSideDrawer }) => {
   const userData = useSelector((state) => state.user?.userData);
   const notifications = useSelector((state) => state.notification);
+  const { selectedChat } = useSelector((state) => state.chatData);
   const [showNotification, setShowNotification] = useState(false);
 
   const dispatch = useDispatch();
 
   return (
     <div
-      className={`bg-color1 border-[5px]  border-color7 flex justify-between items-center py-2.5 px-5 sm:px-10`}
+      className={` bg-color1 border-[5px]  border-color7 ${
+        selectedChat ? "hidden md:flex" : ""
+      } flex justify-between items-center py-2.5 px-4 sm:px-10`}
     >
       <button
         className="flex items-center font-medium text-lg"
         onClick={() => setShowSideDrawer(true)}
       >
-        <PersonSearchIcon />
+        <PersonSearchIcon style={{ fontSize: "26px" }} />
         <span className="hidden md:inline">Search User</span>
       </button>
       <div
@@ -39,7 +43,7 @@ const Header = ({ setShowSideDrawer }) => {
             className=" cursor-pointer"
             onClick={() => setShowNotification(!showNotification)}
           >
-            <NotificationsIcon style={{ fontSize: "27px" }} />
+            <NotificationsIcon style={{ fontSize: "26px" }} />
             {notifications?.length > 0 && (
               <span className="w-[18px] h-[18px] px-0.5 rounded-full text-center text-white text-xs bg-red-500 absolute -right-1 -top-[5px]">
                 {notifications.length > 9 ? "9+" : notifications.length}
@@ -47,9 +51,11 @@ const Header = ({ setShowSideDrawer }) => {
             )}
           </div>
           {showNotification && (
-            <div className="bg-white w-80 h-max-[500px] absolute z-[1] -left-[40px] top-[150%] shadow-2xl">
+            <div className="bg-white w-60 sm:w-80 h-max-[500px] overflow-y-auto absolute z-[1] md:-left-[40px] right-0 md:right-auto top-[150%] shadow-2xl">
               {!notifications?.length ? (
-                <p className=" px-4 py-2">No new Notifications</p>
+                <p className=" px-4 py-2 text-center font-semibold">
+                  No new Notifications
+                </p>
               ) : (
                 <div>
                   <p className="py-2 text-center ">
@@ -105,11 +111,15 @@ const Header = ({ setShowSideDrawer }) => {
 
         <div className="w-10 h-10 bg-gray-300 rounded-full">
           <img
-            src={userData.profilePic}
+            src={userData.profilePic || userImg}
             alt=""
             className="object-cover w-full h-full rounded-full border-2 cursor-pointer"
             onClick={() => dispatch(setModalType("LoggedUserProfile"))}
-            style={{ boxShadow: "0 3px 1px rgba(0,0,0,0.2)" }}
+            style={
+              userData.profilePic
+                ? { boxShadow: "0 3px 1px rgba(0,0,0,0.2)" }
+                : {}
+            }
           />
         </div>
         {/* <KeyboardArrowDownIcon /> */}

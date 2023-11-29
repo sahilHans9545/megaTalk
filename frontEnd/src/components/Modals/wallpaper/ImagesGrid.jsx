@@ -4,12 +4,12 @@ import { setSelectedChat } from "../../../store/slices/chatSlice";
 import { toast } from "react-toastify";
 import axios from "axios";
 import OvalLoading from "../../OvalLoading";
-import socket from "../../../socket";
 import { setModalType } from "../../../store/slices/modalSlice";
 
-const ImagesGrid = ({ images }) => {
+const ImagesGrid = ({ socket, images }) => {
   const { selectedChat } = useSelector((state) => state.chatData);
   const { userInfo, userData } = useSelector((state) => state.user);
+
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const changeWallpaper = async (image) => {
@@ -35,6 +35,7 @@ const ImagesGrid = ({ images }) => {
       dispatch(setSelectedChat(data));
       socket.emit("wallpaper change", data, userData._id);
     } catch (error) {
+      console.log(error);
       setLoading(false);
       toast.error("Error Occured!");
     }

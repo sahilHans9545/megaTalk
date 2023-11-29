@@ -7,7 +7,7 @@ import { Audio } from "react-loader-spinner";
 import axios from "axios";
 import { setChats } from "../store/slices/chatSlice";
 
-const SideDrawer = ({ setShowSideDrawer }) => {
+const SideDrawer = ({ ShowSideDrawer, setShowSideDrawer }) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
@@ -82,7 +82,11 @@ const SideDrawer = ({ setShowSideDrawer }) => {
   };
 
   return (
-    <div className="w-[340px] fixed top-0 left-0 bg-white dark:bg-dark-secondary h-screen z-10 shadow-2xl">
+    <div
+      className={`w-[340px] fixed top-0 left-0 transition-transform ${
+        !ShowSideDrawer ? "-translate-x-full" : "translate-x-0"
+      } bg-white dark:bg-dark-secondary h-screen z-10 shadow-2xl`}
+    >
       <p className="py-4 px-3 text-xl flex items-center justify-between font-semibold dark:bg-dark-primary dark:text-white">
         Search Users...{" "}
         <span

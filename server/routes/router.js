@@ -9,6 +9,7 @@ const {
   addToGroup,
   renameGroup,
   chatWallpaper,
+  clearWallpaper,
   // sendNotification,
 } = require("../controllers/chatControllers.js");
 
@@ -49,6 +50,7 @@ router.route("/chat").get(AuthObj.Auth, fetchChats);
 router.route("/chat/group").post(AuthObj.Auth, createGroupChat);
 router.route("/chat/rename").put(AuthObj.Auth, renameGroup);
 router.route("/chat/wallpaper").put(AuthObj.Auth, chatWallpaper);
+router.route("/chat/clearWallpaper").put(AuthObj.Auth, clearWallpaper);
 router.route("/group/removeUser").put(AuthObj.Auth, removeFromGroup);
 router.route("/group/addUser").put(AuthObj.Auth, addToGroup);
 // router.route("/group/leave").put(AuthObj.Auth, leaveGroup);

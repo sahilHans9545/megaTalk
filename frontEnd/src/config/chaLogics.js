@@ -61,3 +61,14 @@ export const isPreviousDiff = (messages, m, i, userId) => {
 
   return messages[i - 1].sender._id !== messages[i].sender._id;
 };
+
+export const getProfileName = (username = "") => {
+  const nameArray = username.split(" ");
+  console.log(nameArray);
+  if (username === "") return;
+  if (nameArray.length < 2) {
+    return nameArray[0].substring(0, 2).toUpperCase();
+  } else {
+    return nameArray[0][0].toUpperCase() + nameArray[1][0].toUpperCase();
+  }
+};

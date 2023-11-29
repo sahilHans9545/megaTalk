@@ -8,16 +8,18 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedChat } from "../store/slices/chatSlice";
+import { setFetchAgain, setSelectedChat } from "../store/slices/chatSlice";
 import { setModalType } from "../store/slices/modalSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { getProfileName } from "../config/chaLogics";
 
 const ChatHeader = ({ sender, setMessages, messages }) => {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
-  const { selectedChat } = useSelector((state) => state.chatData);
+  const { selectedChat, fetchAgain } = useSelector((state) => state.chatData);
   const { userInfo } = useSelector((state) => state.user);
+  console.log("SENDER", sender);
   const emptyChat = async () => {
     if (!selectedChat) return;
 
@@ -31,12 +33,13 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
       };
 
       const { data } = await axios.get(
-        `https://megatalkbackend.onrender.com/api/emptyChat/${selectedChat._id}`,
+        `http://localhost:5000/api/emptyChat/${selectedChat._id}`,
         config
       );
       console.log("DATA FROM SERVER", data);
       toast("Chat Deleted Successfully!");
-      setMessages([]);
+      dispatch(setMessages([]));
+      dispatch(setFetchAgain(!fetchAgain));
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.msg);
@@ -44,10 +47,10 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
     setShowMenu(false);
   };
   return (
-    <div className="flex items-center justify-between gap-9 bg-white dark:text-white dark:bg-dark-grayish  py-2 px-4 lg:px-10 shadow-2xl">
+    <div className="flex items-center justify-between gap-9 bg-white dark:text-white dark:bg-dark-grayish  py-2 px-3 lg:px-10 shadow-2xl">
       <div className="flex items-center gap-3">
         <span
-          className="bg-slate-600 p-1 text-white rounded-lg md:hidden mr-1 cursor-pointer "
+          className="bg-slate-600 dark:bg-dark-primary p-1 text-white rounded-lg md:hidden mr-1 cursor-pointer "
           onClick={() => dispatch(setSelectedChat(""))}
         >
           <KeyboardBackspaceIcon
@@ -55,16 +58,26 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
             style={{ fontSize: "25px" }}
           />
         </span>
-        <div className="w-11 h-11 rounded-full bg-slate-400">
-          <img
-            src={sender.profilePic}
-            alt=""
-            className="w-full h-full object-cover rounded-full"
-            style={{
-              boxShadow: "0 3px 2px rgba(0,0,0,0.2)",
-              border: "1px solid gray",
-            }}
-          />
+        <div className="w-11 h-11 rounded-full bg-blue-100 dark:text-black text-sm font-medium flex justify-center items-center relative">
+          {sender.profilePic ? (
+            <img
+              src={sender.profilePic}
+              alt=""
+              className="w-11 h-11 object-cover rounded-full"
+              style={{
+                boxShadow: "0 2px 1px rgba(0,0,0,0.2)",
+                border: "1px solid gray",
+              }}
+            />
+          ) : (
+            getProfileName(sender.username)
+          )}
+
+          {sender?.isOnline ? (
+            <span className="absolute bottom-0 right-0 bg-green-500 border-white border-2 rounded-full w-3 h-3"></span>
+          ) : (
+            <span className="absolute bottom-0 right-0 bg-red-500 border-white border-2 rounded-full w-3 h-3"></span>
+          )}
         </div>
 
         <span className="font-semibold text-lg md:text-xl">
@@ -72,7 +85,7 @@ const ChatHeader = ({ sender, setMessages, messages }) => {
         </span>
       </div>
       <div className="flex items-center gap-4 relative">
-        <CallIcon className="cursor-pointer" />
+        {/* <CallIcon className="cursor-pointer" /> */}
         <MoreVertIcon
           className="cursor-pointer"
           onClick={() => setShowMenu(true)}

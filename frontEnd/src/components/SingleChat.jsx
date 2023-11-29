@@ -7,30 +7,24 @@ import {
   setMessages,
   setSelectedChat,
 } from "../store/slices/chatSlice";
-import { Oval, ThreeDots } from "react-loader-spinner";
+import { Oval } from "react-loader-spinner";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ScrollableChat from "./ScrollableChat";
 import { getSenderFull } from "../config/chaLogics";
-import io from "socket.io-client";
-import socket from "../socket";
 import ChatHeader from "./ChatHeader";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useRef } from "react";
 import GroupChat from "./GroupChat";
 import defaultBg from "../assets/defaultChatBg.png";
-import { setNotifications } from "../store/slices/notificationSlice";
 
-let selectedChatCompare;
-
-const SingleChat = () => {
+const SingleChat = ({ socket }) => {
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [showEmoji, setShowEmoji] = useState(false);
   const selectedChat = useSelector((state) => state.chatData.selectedChat);
   const { userInfo } = useSelector((state) => state.user);
-  // const { notification } = useSelector((state) => state);
   const user = useSelector((state) => state.user.userData);
   const dispatch = useDispatch();
   const [sender, setSender] = useState({});
@@ -60,7 +54,6 @@ const SingleChat = () => {
         `https://megatalkbackend.onrender.com/api/message/${selectedChat._id}`,
         config
       );
-      // setMessages(data);
       dispatch(setMessages(data));
       setLoading(false);
 
@@ -71,9 +64,10 @@ const SingleChat = () => {
     }
   };
 
-  const sendMessage = async (event = {}) => {
-    console.log(userInfo);
-    if (event.key === "Enter" && newMessage) {
+  const sendMessage = async () => {
+    // console.log(userInfo);
+    setShowEmoji(false);
+    if (newMessage) {
       socket.emit("stop typing", selectedChat._id);
       try {
         const config = {
@@ -85,14 +79,13 @@ const SingleChat = () => {
         setNewMessage("");
 
         const { data } = await axios.post(
-          "https://megatalkbackend.onrender.com/api/message",
+          "http://localhost:5000/api/message",
           {
             content: newMessage,
             chatId: selectedChat._id,
           },
           config
         );
-        // setMessages([...messages, data]);
         dispatch(setMessages([...messages, data]));
         socket.emit("new message", data);
         dispatch(setFetchAgain(!fetchAgain));
@@ -105,12 +98,7 @@ const SingleChat = () => {
     }
   };
   const typingHandler = (e) => {
-    // setLoading(false);
     setNewMessage(e.target.value);
-    console.log(inputRef.current.selectionStart, "--> Typing");
-
-    // if (!socketConnected) return;
-
     if (!typing) {
       setTyping(true);
       socket.emit("typing", selectedChat._id);
@@ -140,12 +128,17 @@ const SingleChat = () => {
   useEffect(() => {
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
+
+    return () => {
+      socket.off("typing");
+      socket.off("stop typing");
+    };
   }, []);
 
   useEffect(() => {
+    console.log("STATE change ho rhi hai");
     setSender(getSenderFull(user, selectedChat.users));
     fetchMessages();
-    selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
   return (
@@ -202,7 +195,11 @@ const SingleChat = () => {
           type="text"
           required
           className="w-full py-2.5 ps-4 pr-7 border-[2px] border-gray-400 dark:text-white focus:outline-blue-500 rounded-full dark:bg-dark-primary"
-          onKeyDown={sendMessage}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              sendMessage();
+            }
+          }}
           value={newMessage}
           onChange={typingHandler}
           placeholder="Type a message"
@@ -210,13 +207,10 @@ const SingleChat = () => {
         />
         <SendIcon
           className="dark:text-white absolute right-9 lg:right-16 top-1/2 -translate-y-1/2 cursor-pointer"
-          onClick={() => {
-            console.log("SLSLSL");
-            sendMessage();
-          }}
+          onClick={sendMessage}
         />
         {showEmoji && (
-          <div className="absolute bottom-20 sm:bottom-24 sm:left-5 left-0 w-[100%] ">
+          <div className="absolute bottom-20 sm:bottom-24 sm:left-5 left-1/2 sm:translate-x-0 -translate-x-1/2 max-w-[100%] ">
             {" "}
             <Picker
               data={data}

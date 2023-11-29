@@ -95,6 +95,7 @@
 
 em-emoji-picker{
     max-width: 100%;
+    max-height: 50vh;
 }
 
 @media screen and (max-width:576px) {

@@ -9,6 +9,7 @@ import { clearTheme } from "../../store/slices/themeSlice";
 
 const EmailVerify = () => {
   const [validUrl, setValidUrl] = useState(false);
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -19,7 +20,6 @@ const EmailVerify = () => {
     localStorage.removeItem("themeColor");
     dispatch(clearChat());
     dispatch(clearTheme());
-    // alert("Log out");
   };
 
   useEffect(() => {
@@ -28,11 +28,14 @@ const EmailVerify = () => {
         const url = `https://megatalkbackend.onrender.com/api/user/${param.id}/verify/${param.token}`;
         const { data } = await axios.get(url);
         handleLogOut();
-        console.log(data);
+        // console.log(data);
         setValidUrl(true);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
+
         setValidUrl(false);
+      } finally {
+        setLoading(false);
       }
     };
     verifyEmailUrl();
@@ -55,7 +58,10 @@ const EmailVerify = () => {
           </Link>
         </div>
       ) : (
-        <h1 className="text-3xl font-semibold text-center"> 404 Not Found</h1>
+        <div className="text-3xl min-h-screen w-full bg-[#ea5d5d] text-white flex  justify-center items-center">
+          {" "}
+          404 Not Found
+        </div>
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import { setSelectedChat } from "../store/slices/chatSlice";
 import { setModalType } from "../store/slices/modalSlice";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getProfileName } from "../config/chaLogics";
 
 const GroupChat = () => {
   const selectedChat = useSelector((state) => state.chatData.selectedChat);
@@ -44,20 +45,16 @@ const GroupChat = () => {
   };
   return (
     <div>
-      <div className="flex items-center justify-between gap-9 bg-[#27313D] text-white py-2 px-10 shadow-inner">
+      <div className="flex items-center justify-between gap-9 bg-white dark:bg-dark-grayish dark:text-white py-2 px-3 lg:px-10 shadow-inner">
         <div className="flex items-center gap-3">
           <span
-            className="bg-slate-600 p-2 text-white rounded-lg md:hidden "
+            className="bg-slate-600 dark:bg-dark-primary p-1 text-white rounded-lg md:hidden "
             onClick={() => dispatch(setSelectedChat(""))}
           >
-            <KeyboardBackspaceIcon />
+            <KeyboardBackspaceIcon style={{ fontSize: "25px" }} />
           </span>
-          <div className="w-11 h-11 rounded-full bg-slate-400">
-            {/* <img
-              src={selectedChat.users[0].profilePic}
-              alt=""
-              className="w-12 h-12 rounded-full"
-            /> */}
+          <div className="md:w-11 md:h-11 h-10 w-10 rounded-full bg-blue-100 dark:text-black text-sm font-medium flex justify-center items-center">
+            {getProfileName(selectedChat.chatName)}
           </div>
 
           <span className="font-semibold text-lg md:text-xl">

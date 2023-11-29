@@ -4,6 +4,7 @@ import { chatSlice } from "./slices/chatSlice";
 import { modalSlice } from "./slices/modalSlice";
 import { themeSlice } from "./slices/themeSlice";
 import { notificationSlice } from "./slices/notificationSlice";
+import { socketSlice } from "./slices/socketSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     modalType: modalSlice.reducer,
     theme: themeSlice.reducer,
     notification: notificationSlice.reducer,
+    socket: socketSlice.reducer,
   },
 });
 

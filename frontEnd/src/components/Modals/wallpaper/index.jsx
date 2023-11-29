@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setModalType } from "../../../store/slices/modalSlice";
 import axios from "axios";
 import ImagesGrid from "./ImagesGrid";
+import { toast } from "react-toastify";
+
+import { setSelectedChat } from "../../../store/slices/chatSlice";
+import OvalLoading from "../../OvalLoading";
 
 const wallpaperTypes = [
   "Nature",
@@ -23,10 +27,41 @@ const wallpaperTypes = [
   "India",
 ];
 
-const Wallpaper = () => {
+const Wallpaper = ({ socket }) => {
   const [bgType, setBgType] = useState("");
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState("");
+  const { userInfo, userData } = useSelector((state) => state.user);
+  const { selectedChat } = useSelector((state) => state.chatData);
+
   const dispatch = useDispatch();
+
+  const clearWallpaper = async (image) => {
+    try {
+      setLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.put(
+        `http://localhost:5000/api/chat/clearWallpaper`,
+        {
+          chatId: selectedChat._id,
+        },
+        config
+      );
+      setLoading(false);
+      dispatch(setModalType(""));
+      console.log("DATA", data);
+      dispatch(setSelectedChat(data));
+      socket.emit("wallpaper change", data, userData._id);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+      toast.error("Error Occured!");
+    }
+  };
 
   const fetchImages = async () => {
     try {
@@ -47,7 +82,7 @@ const Wallpaper = () => {
       {bgType ? (
         <div className="flex flex-col gap-2">
           <div className="flex1 overflow-auto">
-            <ImagesGrid images={images} />
+            <ImagesGrid socket={socket} images={images} />
           </div>
           <span
             className="self-end w-fit float-right border border-color5 text-color5 py-2 px-7 cursor-pointer text-center hover:bg-color7 hover:text-white dark:bg-color6 dark:text-white"
@@ -82,9 +117,16 @@ const Wallpaper = () => {
                 </span>
               );
             })}
-            <span className="border border-color5 dark:bg-color6 dark:text-white text-color5 py-1 px-2 text-center">
-              Clear
-            </span>
+            {!loading ? (
+              <span
+                className="border border-color5 dark:bg-color6 dark:text-white text-color5 py-1 px-2 text-center cursor-pointer"
+                onClick={clearWallpaper}
+              >
+                Clear
+              </span>
+            ) : (
+              <OvalLoading />
+            )}
           </div>
         </div>
       )}

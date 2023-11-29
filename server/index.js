@@ -1,15 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-
+const jwt = require("jsonwebtoken");
 dotenv.config();
 const cors = require("cors");
 const router = require("./routes/router");
 const path = require("path");
+const User = require("./models/userModel");
 bodyParser = require("body-parser");
 const app = express();
 
 app.use(cors());
+
 app.disable("x-powered-by");
 
 app.use(express.json());
@@ -75,22 +77,24 @@ const server = app.listen(5000, () => {
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: ["https://megatalk.onrender.com", "http://localhost:5173"],
+    origin: ["http://localhost:5173/", "https://megatalk.onrender.com/"],
   },
 });
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log("Connected to socket.io");
   socket.on("setup", (userData) => {
     socket.join(userData._id);
-    console.log(
-      "******  USERID ******",
-      userData._id,
-      " *** USERNAME ***",
-      userData.username
-    );
+    console.log(" *** USERNAME ***", userData.username);
     socket.emit("connected");
   });
+
+  const userId = socket.handshake.auth.token;
+  console.log(userId);
+  // console.log(socket);
+
+  await User.findByIdAndUpdate({ _id: userId }, { $set: { isOnline: true } });
+  socket.broadcast.emit("getOnlineUser", { userId });
 
   socket.on("join chat", (room) => {
     socket.join(room);
@@ -128,8 +132,16 @@ io.on("connection", (socket) => {
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
-  socket.off("setup", () => {
+  socket.off("setup", (userData) => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);
+  });
+  socket.on("disconnect", async () => {
+    const user = await User.findByIdAndUpdate(
+      { _id: userId },
+      { $set: { isOnline: false } }
+    );
+    socket.broadcast.emit("getOfflineUser", { userId });
+    console.log(user.username, " User disconnected");
   });
 });

@@ -88,6 +88,28 @@ const verifyUserAccount = async (req, res) => {
 const register = async (req, res) => {
   try {
     const { username, email, profilePic } = req.body;
+
+    // name validation
+    var usernameRegex = /^[a-zA-Z0-9]+$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        message: "Username must contain only alphanumeric characters.",
+      });
+    }
+
+    //  email format validation
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
+
+    // password minimum length validation
+    if (req.body.password.length < 5) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 5 characters long." });
+    }
+
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       // console.log("existingUser here", existingUser);
@@ -131,7 +153,7 @@ const register = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send({ message: error });
+    res.status(500).send({ message: error.message });
   }
 };
 

@@ -7,7 +7,8 @@ import { setModalType } from "../../store/slices/modalSlice";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { setUser } from "../../store/slices/userSlice";
-console.log("ProfileMODAL");
+import postDetails from "../../utils/profileUpload";
+// console.log("ProfileMODAL");
 const Profile = () => {
   const user = useSelector((state) => state.user.userData);
   const userInfo = useSelector((state) => state.user.userInfo);
@@ -16,24 +17,28 @@ const Profile = () => {
   const [About, setAbout] = useState(user.about);
   console.log("I AM PROFILE MODAL");
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const filereader = new FileReader(file);
-      filereader.readAsDataURL(file);
-      filereader.onload = () => {
-        resolve(filereader.result);
-      };
-      // filereader.onerror((err) => reject(err));
-      filereader.onerror = (err) => {
-        reject(err);
-      };
-    });
-  };
+  // const convertToBase64 = (file) => {
+  //   return new Promise((resolve, reject) => {
+  //     const filereader = new FileReader(file);
+  //     filereader.readAsDataURL(file);
+  //     filereader.onload = () => {
+  //       resolve(filereader.result);
+  //     };
+  //     // filereader.onerror((err) => reject(err));
+  //     filereader.onerror = (err) => {
+  //       reject(err);
+  //     };
+  //   });
+  // };
 
   const onUpload = async (e) => {
-    console.log(e.target.files[0]);
-    const base64 = await convertToBase64(e.target.files[0]);
-    setFile(base64);
+    try {
+      const data = await postDetails(e.target.files[0]);
+      console.log(data);
+      setFile(data.url);
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   const handleSubmit = async () => {
@@ -104,6 +109,7 @@ const Profile = () => {
             type="file"
             id="profile"
             placeholder="Enter your image"
+            accept="image/*"
             className="hidden "
             onChange={onUpload}
           />

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { ThreeDots } from "react-loader-spinner";
+import userImg from "../assets/user.png";
 import {
   getOnceSenderUsername,
   isLastMessage,
@@ -14,9 +15,26 @@ const ScrollableChat = ({ messages, istyping }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
   }, [messages, istyping]);
-  console.log("SCROLL ", messages);
+
+  const convertTime = (createdTime) => {
+    const utcTimestamp = "2023-11-29T08:43:53.274Z";
+    const date = new Date(createdTime);
+
+    const options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    };
+
+    const formattedTime = new Intl.DateTimeFormat("en-US", options).format(
+      date
+    );
+
+    return formattedTime;
+  };
+
   return (
-    <div className="px-3 py-4">
+    <div className="px-2 sm:px-3 py-4">
       {messages &&
         messages.map((message, i) => {
           return (
@@ -30,7 +48,7 @@ const ScrollableChat = ({ messages, istyping }) => {
                   isLastMessage(messages, i, user._id)) && (
                   <div className="absolute bottom-0">
                     <img
-                      src={message.sender.profilePic}
+                      src={message.sender.profilePic || userImg}
                       className="w-8 h-8 rounded-full "
                       alt=""
                     />
@@ -38,7 +56,7 @@ const ScrollableChat = ({ messages, istyping }) => {
                 )}
 
                 <div
-                  className={`ms-10 ${
+                  className={`ms-9 md:ms-10 ${
                     isPreviousDiff(messages, message, i, user._id)
                       ? "mt-4"
                       : "mt-[3.5px]"
@@ -49,15 +67,24 @@ const ScrollableChat = ({ messages, istyping }) => {
                       {message.sender.username}
                     </p>
                   )}
-                  <p
+                  <div
                     className={`${
                       message.sender._id === user._id
                         ? "bg-color6 text-white rounded-tr-[2px]"
                         : "bg-white rounded-tl-[2px]"
-                    } rounded-[20px] px-4 py-1 `}
+                    } rounded-[20px] px-4 py-1 pb-2 relative`}
                   >
-                    {message.content}
-                  </p>
+                    <p>
+                      {" "}
+                      {message.content} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                      &nbsp;
+                    </p>
+                    {/* <p className="pr-16 pt-1"> */}
+                    <span className="text-[10px] absolute bottom-0.5 right-3">
+                      {message?.createdTime}
+                    </span>
+                    {/* </p> */}
+                  </div>
                 </div>
               </div>
             </div>

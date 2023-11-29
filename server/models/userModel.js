@@ -29,6 +29,10 @@ const userSchema = mongoose.Schema(
       type: "String",
       default: "",
     },
+    isOnline: {
+      type: Boolean,
+      default: false, //0 means user offline , 1 means user is online
+    },
     notifications: {
       type: Array,
       default: [],

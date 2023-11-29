@@ -5,8 +5,8 @@ import { useSelector } from "react-redux";
 import SingleChat from "./SingleChat";
 import GroupChat from "./GroupChat";
 
-const ChatBox = () => {
-  console.log("AGREE");
+const ChatBox = ({ socket }) => {
+  // console.log("AGREE");
   const [showChat, setShowChat] = useState(false);
   const selectedChat = useSelector((state) => state.chatData.selectedChat);
 
@@ -18,7 +18,7 @@ const ChatBox = () => {
           <p className="text-2xl">Click on a User to start chatting.</p>
         </div>
       ) : (
-        <SingleChat />
+        <SingleChat socket={socket} />
       )}
     </div>
   );

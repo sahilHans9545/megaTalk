@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../store/slices/userSlice";
 import { getUser } from "../ApiCalls/api";
 import { toast } from "react-toastify";
+import postDetails from "../utils/profileUpload";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,11 +19,14 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [picLoading, setPicLoading] = useState(false);
-  const dispatch = useDispatch();
 
   const handleSubmit = () => {
+    if (!username || !email || !password) {
+      toast.error("Fill all the fields to register!");
+      return;
+    }
     setLoading(true);
-    const url = "https://megatalkbackend.onrender.com/api/register";
+    const url = "http://localhost:5000/api/register";
     const data = {
       username,
       email,
@@ -42,56 +46,23 @@ const SignUp = () => {
       })
       .catch((error) => {
         console.error("Error:", error.response.data);
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data.message);
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  const postDetails = (pics) => {
+  const onUpload = async (e) => {
     setPicLoading(true);
-    if (pics === undefined) {
-      toast.warn("Please Select an Image!");
-      return;
-    }
-    console.log(pics);
-    if (
-      pics.type === "image/jpeg" ||
-      pics.type === "image/png" ||
-      pics.type === "image/jpg"
-    ) {
-      const data = new FormData();
-      console.log("FORMDATA", data);
-      data.append("file", pics);
-      data.append("upload_preset", "MegaTalk");
-      data.append("cloud_name", "dfl5ed5gw");
-      console.log("UP", data);
-      fetch("https://api.cloudinary.com/v1_1/dfl5ed5gw/image/upload", {
-        method: "post",
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data", data);
-          setPic(data.url);
-          console.log(data.url);
-          setPicLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setPicLoading(false);
-        });
-    } else {
-      toast({
-        title: "Please Select an Image!",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
+    try {
+      const data = await postDetails(e.target.files[0]);
+      setPic(data.url);
+      console.log(data.url);
       setPicLoading(false);
-      return;
+    } catch (error) {
+      setPicLoading(false);
+      toast.error(error);
     }
   };
 
@@ -136,7 +107,7 @@ const SignUp = () => {
             placeholder="Enter your image"
             className="hidden "
             // onChange={onUpload}
-            onChange={(e) => postDetails(e.target.files[0])}
+            onChange={onUpload}
           />
         </div>
         <div className="mb-3">

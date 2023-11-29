@@ -12,9 +12,9 @@ const Home = ({ user, setUser }) => {
   return (
     <div
       id="homePage"
-      className=" flex min-h-screen bg-[#0F172A] justify-center"
+      className=" flex min-h-screen bg-[#0F172A] justify-center px-5"
     >
-      <div className=" flex flex-col w-[400px]">
+      <div className=" flex flex-col justify-center md:justify-start w-[400px] max-w-[90vw]">
         <div className="bg-white py-2 text-center px-5 rounded-full text-[22px] flex justify-center items-center gap-4">
           <div>
             Welcome to <span className="text-blue-700">MegaTalk</span>

@@ -12,7 +12,7 @@ const ChatWith = ({ setDisplayChats, chats, searchTerm }) => {
     if (filter === "PEOPLE") {
       let searchedChats = chats?.filter((chat) => {
         return (
-          !chat.isGroupChat &&
+          !chat?.isGroupChat &&
           getSender(userData, chat.users)
             .toLowerCase()
             .includes(searchTerm?.toLowerCase())
@@ -22,7 +22,7 @@ const ChatWith = ({ setDisplayChats, chats, searchTerm }) => {
     } else if (filter === "GROUP") {
       let searchedChats = chats?.filter((chat) => {
         return (
-          chat.isGroupChat &&
+          chat?.isGroupChat &&
           chat.chatName?.toLowerCase().includes(searchTerm.toLowerCase())
         );
       });
@@ -30,11 +30,11 @@ const ChatWith = ({ setDisplayChats, chats, searchTerm }) => {
     } else {
       let searchedChats = chats?.filter((chat) => {
         return (
-          (!chat.isGroupChat &&
+          (!chat?.isGroupChat &&
             getSender(userData, chat.users)
               .toLowerCase()
               .includes(searchTerm?.toLowerCase())) ||
-          (chat.isGroupChat &&
+          (chat?.isGroupChat &&
             chat.chatName?.toLowerCase().includes(searchTerm.toLowerCase()))
         );
       });
@@ -44,7 +44,7 @@ const ChatWith = ({ setDisplayChats, chats, searchTerm }) => {
 
   return (
     <div>
-      <ul className="flex text-[#a4a4a4] dark:text-light-text text-sm font-semibold gap-8 sm:gap-6 lg:gap-10 lg:ps-5">
+      <ul className="flex text-[#a4a4a4] dark:text-light-text text-sm font-semibold gap-8 sm:justify-start sm:gap-6 lg:gap-10 lg:ps-5">
         {displayTypes.map((type, id) => {
           return (
             <li

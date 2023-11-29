@@ -7,13 +7,14 @@ import { setChats, setSelectedChat } from "../store/slices/chatSlice";
 import { getSender, getSenderIndex } from "../config/chaLogics";
 import { setModalType } from "../store/slices/modalSlice";
 import userImg from "../assets/user.png";
+import groupImg from "../assets/group.jpg";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "../store/slices/userSlice";
 import { Oval } from "react-loader-spinner";
+import MenuIcon from "@mui/icons-material/Menu";
 
 const MyChats = () => {
   const { userInfo, userData } = useSelector((state) => state.user);
-  // const userData = useSelector((state) => state.user.userData);
   const [displayChats, setDisplayChats] = useState([]);
   const { chats, fetchAgain, selectedChat } = useSelector(
     (state) => state.chatData
@@ -24,7 +25,6 @@ const MyChats = () => {
   const [loading, setLoading] = useState(false);
   // console.log("CHAT DATA ", chats);
   const fetchChats = async () => {
-    // console.log(user._id);
     setLoading(true);
     try {
       const config = {
@@ -34,15 +34,14 @@ const MyChats = () => {
       };
 
       const { data } = await axios.get(
-        "https://megatalkbackend.onrender.com/api/chat",
+        // "https://megatalkbackend.onrender.com/api/chat",
+        "http://localhost:5000/api/chat",
         config
       );
 
       setDisplayChats(data);
       dispatch(setChats(data));
       setLoading(false);
-
-      // console.log("FETCED CHATS ARE = ", data);
     } catch (error) {
       if (error.response?.status === 401) {
         console.log(error);
@@ -59,14 +58,12 @@ const MyChats = () => {
   useEffect(() => {
     fetchChats();
   }, [fetchAgain]);
-  // useEffect(() => {
-  //   fetchChats();
-  // }, []);
+
   return (
     <div
       className={`bg-[#2C3544] dark:bg-dark-primary h-full  pt-7 pb-11 relative flex flex-col  `}
     >
-      <div className="px-4">
+      <div className="px-4 relative">
         <input
           type="text"
           placeholder="search chats..."
@@ -83,13 +80,22 @@ const MyChats = () => {
             searchTerm={searchTerm}
           />
         </div>
+        <div className="sm:hidden">
+          {" "}
+          <MenuIcon
+            className=" text-white absolute right-0 -bottom-[10px] box-content py-1.5 px-3 bg-color6 rounded-tl-lg rounded-bl-lg"
+            onClick={() => {
+              dispatch(setModalType("mobileSideMenu"));
+            }}
+          />
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-scroll mt-7">
         <p className=" text-white dark:text-light-text dark:font-semibold px-4">
           YOUR CONVERSATIONS
         </p>
-        <div className="mt-7">
+        <div className="mt-4 lg:mt-7">
           {loading && (
             <div className="flex justify-center py-5">
               <Oval
@@ -116,41 +122,56 @@ const MyChats = () => {
               displayChats.map((userChat, id) => {
                 return (
                   <li
-                    className={`flex gap-5 items-center py-2 px-4 cursor-pointer ${
+                    className={`flex gap-5 items-center justify-between py-2 px-4 cursor-pointer  ${
                       selectedChat?._id === userChat?._id
-                        ? "  dark:shadow-md shadow-sm shadow-color2 bg-[#817c7c6b] dark:bg-dark-grayish"
+                        ? "   bg-[#817c7c6b] dark:bg-dark-grayish"
                         : ""
                     } border-b-2 border-[#384453]`}
                     key={id}
                     onClick={() => dispatch(setSelectedChat(userChat))}
                   >
-                    <div className="chatProfileImg w-10 h-10 rounded-lg bg-gray-50 overflow-hidden">
-                      <img
-                        src={
-                          userChat.users[
-                            getSenderIndex(userData, userChat.users)
-                          ].profilePic || userImg
-                        }
-                        alt=""
-                        className="w-full h-full  object-cover"
-                      />
+                    <div className="flex gap-5 items-center">
+                      <div className="chatProfileImg w-10 h-10 rounded-lg bg-gray-50 overflow-hidden">
+                        <img
+                          src={
+                            !userChat.isGroupChat
+                              ? userChat.users[
+                                  getSenderIndex(userData, userChat.users)
+                                ].profilePic || userImg
+                              : groupImg
+                          }
+                          alt=""
+                          className="w-full h-full  object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 ">
+                        <p className="text-white text-lg font-medium">
+                          {!userChat.isGroupChat
+                            ? getSender(userData, userChat.users)
+                            : userChat.chatName}
+                        </p>
+                        <span
+                          className={`${
+                            selectedChat === userChat
+                              ? "text-white"
+                              : "text-[#a4a4a4]"
+                          } inline-block w-40 md:w-52 text-ellipsis overflow-hidden whitespace-nowrap`}
+                        >
+                          {userChat?.latestMessage?.content || "Send Hello!"}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex-1 max-w-[290px]">
-                      <p className="text-white text-lg font-medium">
-                        {!userChat.isGroupChat
-                          ? getSender(userData, userChat.users)
-                          : userChat.chatName}
-                      </p>
-                      <span
-                        className={`${
-                          selectedChat === userChat
-                            ? "text-white"
-                            : "text-[#a4a4a4]"
-                        } inline-block w-52 text-ellipsis overflow-hidden whitespace-nowrap`}
-                      >
-                        {userChat?.latestMessage?.content || "Send Hello!"}
-                      </span>
-                    </div>
+                    {!userChat.isGroupChat && (
+                      <div>
+                        {userChat.users[
+                          getSenderIndex(userData, userChat.users)
+                        ]?.isOnline ? (
+                          <span className="inline-block bg-green-500 border-white border-2 rounded-full w-3 h-3"></span>
+                        ) : (
+                          <span className="inline-block bg-red-500 border-white border-2 rounded-full w-3 h-3"></span>
+                        )}
+                      </div>
+                    )}
                   </li>
                 );
               })}
